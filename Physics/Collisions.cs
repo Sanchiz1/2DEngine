@@ -29,21 +29,36 @@ namespace Physics
             }
         }
 
-        public static bool IntersectPolygons(Vector2[] vertciesA, Vector2[] vertciesB)
+        public static bool IntersectPolygons(Vector2[] vertciesA, Vector2[] vertciesB, out Vector2 normal, out float depth)
         {
-            for(int i = 0; i < vertciesA.Length; i++)
+            normal = new Vector2(0, 0);
+            depth = float.MaxValue;
+            bool d = false;
+
+            for (int i = 0; i < vertciesA.Length; i++)
             {
                 Vector2 va = vertciesA[i];
                 Vector2 vb = vertciesA[(i + 1) % vertciesA.Length];
 
                 Vector2 edge = vb - va;
                 Vector2 axis = new Vector2(-edge.Y, edge.X);
+                axis.Normalize(axis);
+
                 ProjectVertcies(vertciesA, axis, out float minA, out float maxA);
                 ProjectVertcies(vertciesB, axis, out float minB, out float maxB);
 
-                if(minA >= maxB || minB >= maxA)
+                if (minA >= maxB || minB >= maxA)
                 {
                     return false;
+                }
+
+                float axisdepth = (maxB - minA) < (maxA - minB) ? (maxB - minA) : (maxA - minB);
+                d = (maxB - minA) < (maxA - minB) ? true : false;
+
+                if (axisdepth < depth)
+                {
+                    depth = axisdepth;
+                    normal = axis;
                 }
             }
             for (int i = 0; i < vertciesB.Length; i++)
@@ -53,6 +68,8 @@ namespace Physics
 
                 Vector2 edge = vb - va;
                 Vector2 axis = new Vector2(-edge.Y, edge.X);
+                axis.Normalize(axis);
+
                 ProjectVertcies(vertciesA, axis, out float minA, out float maxA);
                 ProjectVertcies(vertciesB, axis, out float minB, out float maxB);
 
@@ -60,10 +77,44 @@ namespace Physics
                 {
                     return false;
                 }
+
+                float axisdepth = (maxB - minA) < (maxA - minB) ? (maxB - minA) : (maxA - minB);
+                d = (maxB - minA) < (maxA - minB) ? true : false;
+
+                if (axisdepth < depth)
+                {
+                    depth = axisdepth;
+                    normal = axis;
+                }
             }
+
+            Vector2 centerA = FindArithmeticMean(vertciesA);
+            Vector2 centerB = FindArithmeticMean(vertciesB);
+
+            Vector2 direction = centerB - centerA;
+
+            if (normal.DotProduct(direction) < 0)
+            {
+                normal = -normal;
+            }
+
             return true;
         }
-        private static void ProjectVertcies(Vector2[] vertcies,Vector2 axis, out float min, out float max)
+
+        private static Vector2 FindArithmeticMean(Vector2[] vertcies)
+        {
+            float sumX = 0;
+            float sumY = 0;
+
+            for (int i = 0; i < vertcies.Length; ++i)
+            {
+                Vector2 v = vertcies[i];
+                sumX += (float)v.X;
+                sumY += (float)v.Y;
+            }
+            return new Vector2(sumX / (float)vertcies.Length, sumY / (float)vertcies.Length);
+        }
+        private static void ProjectVertcies(Vector2[] vertcies, Vector2 axis, out float min, out float max)
         {
             min = float.MaxValue;
             max = float.MinValue;
@@ -72,16 +123,38 @@ namespace Physics
             {
                 Vector2 v = vertcies[i];
                 float proj = (float)v.DotProduct(axis);
-                
-                if(proj < min)
+
+                if (proj < min)
                 {
                     min = proj;
                 }
-                if(proj > max)
+                if (proj > max)
                 {
                     max = proj;
-                } 
+                }
             }
+        }
+        public static bool IsDotInside(Vector2[] vertciesA, Vector2 dot)
+        {
+            for (int i = 0; i < vertciesA.Length; i++)
+            {
+                Vector2 va = vertciesA[i];
+                Vector2 vb = vertciesA[(i + 1) % vertciesA.Length];
+
+                Vector2 edge = vb - va;
+                Vector2 axis = new Vector2(-edge.Y, edge.X);
+                axis.Normalize(axis);
+
+                ProjectVertcies(vertciesA, axis, out float minA, out float maxA);
+
+                float proj = (float)dot.DotProduct(axis);
+
+                if (minA >= proj || proj >= maxA)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

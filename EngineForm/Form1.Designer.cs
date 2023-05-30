@@ -39,6 +39,7 @@
             // 
             // MainScreen
             // 
+            this.MainScreen.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.MainScreen.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainScreen.Location = new System.Drawing.Point(0, 0);
             this.MainScreen.Name = "MainScreen";

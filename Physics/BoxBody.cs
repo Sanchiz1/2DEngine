@@ -18,8 +18,7 @@ namespace Physics
         }
         public bool IsInside(Vector2 pos)
         {
-            if(pos.X > position.X - width / 2 && pos.X < position.X + width / 2 && pos.Y > position.Y - height / 2 && pos.Y < position.Y + height / 2) return true;
-            return false;
+            return Physics.Collisions.IsDotInside(this.GetTransformedVerticies(), pos);
         }
         public Vector2[] GetVerticies()
         {

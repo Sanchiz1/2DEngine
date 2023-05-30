@@ -26,6 +26,7 @@ namespace EngineForm
         public bool moving;
         public bool rotatingRight;
         public bool rotatingLeft;
+        public float scale = 1;
         public List<Physics.Body> bodies = new List<Physics.Body>();
 
         public Form1()
@@ -59,14 +60,17 @@ namespace EngineForm
                     {
                         if (bodies[j].GetType() == typeof(BoxBody))
                         {
-                            if (Collisions.IntersectPolygons(((BoxBody)bodies[j]).GetTransformedVerticies(), ((BoxBody)bodies[i]).GetTransformedVerticies()))
+                            if (Collisions.IntersectPolygons(
+                                ((BoxBody)bodies[i]).GetTransformedVerticies(),
+                                ((BoxBody)bodies[j]).GetTransformedVerticies(),
+                                out Vector2 normal,
+                                out float depth))
                             {
-                                ((BoxBody)bodies[i]).color = Color.Red;
-                                break;
+                                ((BoxBody)bodies[i]).Move(-normal.Scale((depth / 2.0)));
+                                ((BoxBody)bodies[j]).Move(normal.Scale((depth / 2.0)));
                             }
                             else
                             {
-                                ((BoxBody)bodies[i]).color = Color.Blue;
                             }
                         }
                         if (bodies[j].GetType() == typeof(CircleBody))
@@ -97,8 +101,6 @@ namespace EngineForm
                 {
                     if (((BoxBody)bodies[i]).IsInside(mouse - zero))
                     {
-                        label2.Text = ((BoxBody)bodies[i]).GetTransformedVerticies()[0].ToString() + ((BoxBody)bodies[i]).GetTransformedVerticies()[1].ToString() + ((BoxBody)bodies[i]).GetTransformedVerticies()[2].ToString() + ((BoxBody)bodies[i]).GetTransformedVerticies()[3].ToString();
-
                         if (rotatingRight == true)
                         {
                             bodies[i].rotaion++;
@@ -145,6 +147,14 @@ namespace EngineForm
             {
                 rotatingLeft = true;
             }
+            if (e.KeyCode == Keys.Q)
+            {
+                scale += (float)0.1;
+            }
+            if (e.KeyCode == Keys.A)
+            {
+                scale -= (float)0.1;
+            }
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
@@ -185,13 +195,14 @@ namespace EngineForm
             {
                 if (bodies[i].GetType() == typeof(BoxBody))
                 {
-                    Drawing.DrawBox(e, (BoxBody)bodies[i], zero);
+                    Drawing.DrawBox(e, (BoxBody)bodies[i], zero, scale);
                 }
                 if (bodies[i].GetType() == typeof(CircleBody))
                 {
-                    Drawing.DrawCircle(e, (CircleBody)bodies[i], zero);
+                    Drawing.DrawCircle(e, (CircleBody)bodies[i], zero, scale);
                 }
             }
+            Physics.Drawing.DrawLine(e, new Vector2(0, 0), new Vector2(100, 100), new Pen(Color.White),zero, scale);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -206,7 +217,7 @@ namespace EngineForm
 
         private void MainScreen_MouseMove(object sender, MouseEventArgs e)
         {
-            mouse.X = e.X; mouse.Y = e.Y;
+            mouse.X = e.X / scale; mouse.Y = e.Y / scale;
             label1.Text = mouse.ToString();
             if (moving == true)
             {
