@@ -28,6 +28,7 @@ namespace Physics
                 (int)(box.position.Y - box.height / 2 + zero.Y),
                 (int)(box.width),
                 (int)(box.height));
+            
             e.Graphics.TranslateTransform((float)(box.position.X + zero.X), (float)(box.position.Y + zero.Y));
             e.Graphics.RotateTransform((float)box.rotaion);
             e.Graphics.TranslateTransform((float)-(box.position.X + zero.X), (float)-(box.position.Y + zero.Y));
@@ -39,8 +40,17 @@ namespace Physics
         {
             e.Graphics.ScaleTransform(scale, scale);
             RectangleF Circle = new RectangleF((float)(circle.position.X + zero.X - circle.diameter / 2), (float)(circle.position.Y + zero.Y - circle.diameter / 2), (float)circle.diameter, (float)circle.diameter);
-            e.Graphics.DrawEllipse(new Pen(circle.color, 1), Circle);
             e.Graphics.FillEllipse(new SolidBrush(circle.color), Circle);
+            e.Graphics.DrawEllipse(new Pen(Color.Silver, 2), Circle);
+            e.Graphics.ResetTransform();
+        }
+
+        public static void DrawPolygon(PaintEventArgs e, PolygonBody polygon, Vector2 zero, float scale)
+        {
+            e.Graphics.ScaleTransform(scale, scale);
+            e.Graphics.FillPolygon(new SolidBrush(polygon.color), polygon.GetPoints(polygon.GetTransformedVerticies()));
+            e.Graphics.DrawPolygon(new Pen(Color.Silver, 2), polygon.GetPoints(polygon.GetTransformedVerticies()));
+            e.Graphics.ResetTransform();
         }
     }
 }

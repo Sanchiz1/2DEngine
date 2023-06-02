@@ -69,13 +69,31 @@ namespace EngineForm
                                 ((BoxBody)bodies[i]).Move(-normal.Scale((depth / 2.0)));
                                 ((BoxBody)bodies[j]).Move(normal.Scale((depth / 2.0)));
                             }
-                            else
-                            {
-                            }
                         }
                         if (bodies[j].GetType() == typeof(CircleBody))
                         {
-                            continue;
+                            if (Collisions.IntersectCirclePolygon(
+                                ((CircleBody)bodies[j]).position,
+                                (float)((CircleBody)bodies[j]).diameter / 2,
+                                ((BoxBody)bodies[i]).GetTransformedVerticies(),
+                                out Vector2 normal,
+                                out float depth))
+                            {
+                                ((BoxBody)bodies[i]).Move(normal.Scale((depth / 2.0)));
+                                ((CircleBody)bodies[j]).Move(-normal.Scale((depth / 2.0)));
+                            }
+                        }
+                        if (bodies[j].GetType() == typeof(PolygonBody))
+                        {
+                            if (Collisions.IntersectPolygons(
+                                ((BoxBody)bodies[i]).GetTransformedVerticies(),
+                                ((PolygonBody)bodies[j]).GetTransformedVerticies(),
+                                out Vector2 normal,
+                                out float depth))
+                            {
+                                ((BoxBody)bodies[i]).Move(-normal.Scale((depth / 2.0)));
+                                ((PolygonBody)bodies[j]).Move(normal.Scale((depth / 2.0)));
+                            }
                         }
                     }
                 }
@@ -85,12 +103,20 @@ namespace EngineForm
                     {
                         if (bodies[j].GetType() == typeof(BoxBody))
                         {
-                            continue;
+                            if (Collisions.IntersectCirclePolygon(
+                                ((CircleBody)bodies[i]).position,
+                                (float)((CircleBody)bodies[i]).diameter / 2,
+                                ((BoxBody)bodies[j]).GetTransformedVerticies(),
+                                out Vector2 normal,
+                                out float depth))
+                            {
+                                ((CircleBody)bodies[i]).Move(normal.Scale((depth / 2.0)));
+                                ((BoxBody)bodies[j]).Move(-normal.Scale((depth / 2.0)));
+                            }
                         }
                         if (bodies[j].GetType() == typeof(CircleBody))
                         {
                             Collisions.CirclesCollision((CircleBody)bodies[i], (CircleBody)bodies[j]);
-                            continue;
                         }
                     }
                 }
@@ -100,6 +126,22 @@ namespace EngineForm
                 if (bodies[i].GetType() == typeof(BoxBody))
                 {
                     if (((BoxBody)bodies[i]).IsInside(mouse - zero))
+                    {
+                        if (rotatingRight == true)
+                        {
+                            bodies[i].rotaion++;
+                            break;
+                        }
+                        if (rotatingLeft == true)
+                        {
+                            bodies[i].rotaion--;
+                            break;
+                        }
+                    }
+                }
+                if (bodies[i].GetType() == typeof(PolygonBody))
+                {
+                    if (((PolygonBody)bodies[i]).IsInside(mouse - zero))
                     {
                         if (rotatingRight == true)
                         {
@@ -191,7 +233,7 @@ namespace EngineForm
 
         private void MainScreen_Paint(object sender, PaintEventArgs e)
         {
-            for(int i = bodies.Count() - 1; i >= 0; --i)
+            for (int i = 0; i < bodies.Count; ++i)
             {
                 if (bodies[i].GetType() == typeof(BoxBody))
                 {
@@ -201,18 +243,29 @@ namespace EngineForm
                 {
                     Drawing.DrawCircle(e, (CircleBody)bodies[i], zero, scale);
                 }
+                if (bodies[i].GetType() == typeof(PolygonBody))
+                {
+                    label3.Text = ((PolygonBody)bodies[i]).VertciesToString();
+                    Drawing.DrawPolygon(e, (PolygonBody)bodies[i], zero, scale);
+                }
             }
-            Physics.Drawing.DrawLine(e, new Vector2(0, 0), new Vector2(100, 100), new Pen(Color.White),zero, scale);
+            Physics.Drawing.DrawLine(e, new Vector2(0, 0), new Vector2(100, 100), new Pen(Color.White), zero, scale);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            bodies.Add(new BoxBody(1, new Vector2(100, 100), 1, 0, Color.Pink, 100, 100));
-            bodies.Add(new BoxBody(1, new Vector2(300, 300), 1, 0, Color.Gray, 100, 100));
-            bodies.Add(new BoxBody(1, new Vector2(500, 500), 1, 0, Color.Gray, 100, 100));
-            //bodies.Add(new CircleBody(1, new Vector2(600, 300), 1, 0, Color.Blue, 50));
-            //bodies.Add(new CircleBody(1, new Vector2(700, 300), 1, 0, Color.Red, 50));
-            //bodies.Add(new CircleBody(1, new Vector2(800, 300), 1, 0, Color.Red, 50));
+            Vector2[] v = {
+                new Vector2(100, 100),
+                new Vector2(200, 100),
+                new Vector2(250, 150),
+                new Vector2(200, 200),
+                new Vector2(100, 200),
+            };
+            bodies.Add(new BoxBody(1, new Vector2(500, 100), 1, 0, Color.Pink, 100, 100));
+            bodies.Add(new BoxBody(1, new Vector2(700, 100), 1, 0, Color.Gray, 100, 100));
+            bodies.Add(new CircleBody(1, new Vector2(600, 300), 1, 0, Color.Pink, 50));
+            bodies.Add(new CircleBody(1, new Vector2(700, 300), 1, 0, Color.Gray, 50));
+            bodies.Add(new PolygonBody(1, new Vector2(100, 100), 1, 0, Color.Pink, v));
         }
 
         private void MainScreen_MouseMove(object sender, MouseEventArgs e)
@@ -228,7 +281,6 @@ namespace EngineForm
                         if (((BoxBody)body).IsInside(mouse - zero))
                         {
                             body.MoveTo(mouse - zero);
-                            ToFront(bodies, body);
                             break;
                         }
                     }
@@ -237,20 +289,11 @@ namespace EngineForm
                         if (((CircleBody)body).IsInside(mouse - zero))
                         {
                             body.MoveTo(mouse - zero);
-                            ToFront(bodies, body);
                             break;
                         }
                     }
                 }
             }
-        }
-
-        public void ToFront(List<Physics.Body> bodies, Physics.Body body)
-        {
-            int index = bodies.FindIndex(a => a == body);
-            Physics.Body item = bodies[index];
-            bodies.RemoveAt(index);
-            bodies.Insert(0, item);
         }
     }
 }

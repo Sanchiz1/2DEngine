@@ -29,11 +29,116 @@ namespace Physics
             }
         }
 
+        public static bool IntersectCirclePolygon(Vector2 circlePosition, float radius, Vector2[] vertcies, out Vector2 normal, out float depth)
+        {
+            normal = new Vector2(0, 0);
+            depth = float.MaxValue;
+            Vector2 axis;
+            float axisdepth, minA, maxA, minB, maxB;
+
+            for (int i = 0; i < vertcies.Length; i++)
+            {
+                Vector2 va = vertcies[i];
+                Vector2 vb = vertcies[(i + 1) % vertcies.Length];
+
+                Vector2 edge = vb - va;
+                axis = new Vector2(-edge.Y, edge.X);
+                axis.Normalize(axis);
+
+                ProjectVertcies(vertcies, axis, out minA, out maxA);
+                ProjectCircle(circlePosition, radius, axis, out minB, out maxB);
+
+                if (minA >= maxB || minB >= maxA)
+                {
+                    return false;
+                }
+
+                axisdepth = (maxB - minA) < (maxA - minB) ? (maxB - minA) : (maxA - minB);
+
+                if (axisdepth < depth)
+                {
+                    depth = axisdepth;
+                    normal = axis;
+                }
+            }
+
+            int cpindex = FindClosestPoint(circlePosition, vertcies);
+            Vector2 cp = vertcies[cpindex];
+
+            axis = cp - circlePosition;
+            axis.Normalize(axis);
+
+            ProjectVertcies(vertcies, axis, out minA, out maxA);
+            ProjectCircle(circlePosition, radius, axis, out minB, out maxB);
+
+            if (minA >= maxB || minB >= maxA)
+            {
+                return false;
+            }
+
+            axisdepth = (maxB - minA) < (maxA - minB) ? (maxB - minA) : (maxA - minB);
+
+            if (axisdepth < depth)
+            {
+                depth = axisdepth;
+                normal = axis;
+            }
+
+
+            Vector2 center = FindArithmeticMean(vertcies);
+
+            Vector2 direction = center - circlePosition;
+
+            if (normal.DotProduct(direction) < 0)
+            {
+                normal = -normal;
+            }
+
+            return true;
+        }
+
+        private static int FindClosestPoint(Vector2 circlePosition, Vector2[] vertcies)
+        {
+            int result = -1;
+            float minDistance = float.MaxValue;
+
+            for (int i = 0; i < vertcies.Length; i++)
+            {
+                Vector2 v = vertcies[i];
+                float distance = (float)(v - circlePosition).Length();
+
+                if(distance < minDistance)
+                {
+                    minDistance = distance;
+                    result = i;
+                }
+            }
+            return result;
+        }
+
+        private static void ProjectCircle(Vector2 circlePosition, float radius, Vector2 axis, out float min, out float max)
+        {
+            Vector2 direction = new Vector2(0, 0);
+            direction.Normalize(axis);
+
+            Vector2 p1 = circlePosition + direction.Scale(radius);
+            Vector2 p2 = circlePosition - direction.Scale(radius);
+
+            min = (float)axis.DotProduct(p1);
+            max = (float)axis.DotProduct(p2);
+
+            if(min > max)
+            {
+                float temp = min;
+                min = max;
+                max = temp;
+            }
+        }
+
         public static bool IntersectPolygons(Vector2[] vertciesA, Vector2[] vertciesB, out Vector2 normal, out float depth)
         {
             normal = new Vector2(0, 0);
             depth = float.MaxValue;
-            bool d = false;
 
             for (int i = 0; i < vertciesA.Length; i++)
             {
@@ -53,7 +158,6 @@ namespace Physics
                 }
 
                 float axisdepth = (maxB - minA) < (maxA - minB) ? (maxB - minA) : (maxA - minB);
-                d = (maxB - minA) < (maxA - minB) ? true : false;
 
                 if (axisdepth < depth)
                 {
@@ -79,7 +183,6 @@ namespace Physics
                 }
 
                 float axisdepth = (maxB - minA) < (maxA - minB) ? (maxB - minA) : (maxA - minB);
-                d = (maxB - minA) < (maxA - minB) ? true : false;
 
                 if (axisdepth < depth)
                 {
@@ -101,7 +204,7 @@ namespace Physics
             return true;
         }
 
-        private static Vector2 FindArithmeticMean(Vector2[] vertcies)
+        public static Vector2 FindArithmeticMean(Vector2[] vertcies)
         {
             float sumX = 0;
             float sumY = 0;

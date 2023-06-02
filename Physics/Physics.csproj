@@ -49,6 +49,7 @@
     <Compile Include="Collisions.cs" />
     <Compile Include="Drawing.cs" />
     <Compile Include="PhysicsMath.cs" />
+    <Compile Include="PolygonBody.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vector2.cs" />
   </ItemGroup>

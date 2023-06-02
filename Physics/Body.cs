@@ -23,7 +23,7 @@ namespace Physics
             color = Color;
         }
 
-        public void Move(Vector2 dir)
+        public virtual void Move(Vector2 dir)
         {
             this.position += dir;
         }
