@@ -48,8 +48,8 @@ namespace Physics
         public static void DrawPolygon(PaintEventArgs e, PolygonBody polygon, Vector2 zero, float scale)
         {
             e.Graphics.ScaleTransform(scale, scale);
-            e.Graphics.FillPolygon(new SolidBrush(polygon.color), polygon.GetPoints(polygon.GetTransformedVerticies()));
-            e.Graphics.DrawPolygon(new Pen(Color.Silver, 2), polygon.GetPoints(polygon.GetTransformedVerticies()));
+            e.Graphics.FillPolygon(new SolidBrush(polygon.color), polygon.GetPoints(polygon.GetTransformedVerticies(), zero));
+            e.Graphics.DrawPolygon(new Pen(Color.Silver, 2), polygon.GetPoints(polygon.GetTransformedVerticies(), zero));
             e.Graphics.ResetTransform();
         }
     }

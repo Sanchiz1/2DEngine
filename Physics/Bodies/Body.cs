@@ -27,7 +27,7 @@ namespace Physics
         {
             this.position += dir;
         }
-        public void MoveTo(Vector2 dest)
+        public virtual void MoveTo(Vector2 dest)
         {
             this.position = dest;
         }

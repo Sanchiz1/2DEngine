@@ -13,6 +13,7 @@ namespace Physics
         public PolygonBody(double Mass, Vector2 Position, double Velocity, double Rotation, Color Color, Vector2[] Vertcies) : base(Mass, Position, Velocity, Rotation, Color)
         {
             vertcies = Vertcies;
+            position = vertcies[0];
         }
         public Vector2[] GetTransformedVerticies()
         {
@@ -31,12 +32,12 @@ namespace Physics
             return degrees * Math.PI / 180.0;
         }
 
-        public PointF[] GetPoints(Vector2[] v)
+        public PointF[] GetPoints(Vector2[] v, Vector2 zero)
         {
             PointF[] p = new PointF[vertcies.Length];
             for (int i = 0; i < v.Length; ++i)
             {
-                p[i] = new PointF((float)v[i].X, (float)v[i].Y);
+                p[i] = new PointF((float)(v[i].X + zero.X), (float)(v[i].Y + zero.Y));
             }
             return p;
         }
@@ -59,6 +60,14 @@ namespace Physics
             for (int i = 0; i < vertcies.Length; ++i)
             {
                 vertcies[i] += dir;
+            }
+        }
+        public override void MoveTo(Vector2 dir)
+        {
+            Vector2 addition = Collisions.FindArithmeticMean(vertcies) - dir;
+            for (int i = 0; i < vertcies.Length; ++i)
+            {
+                vertcies[i] -= addition;
             }
         }
     }

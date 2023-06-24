@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 using Physics;
-using System.Reflection;
-using System.Collections;
 
 namespace EngineForm
 {
@@ -117,6 +109,62 @@ namespace EngineForm
                         if (bodies[j].GetType() == typeof(CircleBody))
                         {
                             Collisions.CirclesCollision((CircleBody)bodies[i], (CircleBody)bodies[j]);
+                        }
+                        if (bodies[j].GetType() == typeof(PolygonBody))
+                        {
+                            if (Collisions.IntersectCirclePolygon(
+                                ((CircleBody)bodies[i]).position,
+                                (float)((CircleBody)bodies[i]).diameter / 2,
+                                ((PolygonBody)bodies[j]).GetTransformedVerticies(),
+                                out Vector2 normal,
+                                out float depth))
+                            {
+                                ((CircleBody)bodies[i]).Move(-normal.Scale((depth / 2.0)));
+                                ((PolygonBody)bodies[j]).Move(normal.Scale((depth / 2.0)));
+                            }
+                        }
+                    }
+                }
+                if (bodies[i].GetType() == typeof(PolygonBody))
+                {
+                    for (int j = i + 1; j < bodies.Count; ++j)
+                    {
+                        if (bodies[j].GetType() == typeof(BoxBody))
+                        {
+                            if (Collisions.IntersectPolygons(
+                                ((BoxBody)bodies[j]).GetTransformedVerticies(),
+                                ((PolygonBody)bodies[i]).GetTransformedVerticies(),
+                                out Vector2 normal,
+                                out float depth))
+                            {
+                                ((BoxBody)bodies[j]).Move(-normal.Scale((depth / 2.0)));
+                                ((PolygonBody)bodies[i]).Move(normal.Scale((depth / 2.0)));
+                            }
+                        }
+                        if (bodies[j].GetType() == typeof(CircleBody))
+                        {
+                            if (Collisions.IntersectCirclePolygon(
+                                ((CircleBody)bodies[j]).position,
+                                (float)((CircleBody)bodies[j]).diameter / 2,
+                                ((PolygonBody)bodies[i]).GetTransformedVerticies(),
+                                out Vector2 normal,
+                                out float depth))
+                            {
+                                ((CircleBody)bodies[j]).Move(-normal.Scale((depth / 2.0)));
+                                ((PolygonBody)bodies[i]).Move(normal.Scale((depth / 2.0)));
+                            }
+                        }
+                        if (bodies[j].GetType() == typeof(PolygonBody))
+                        {
+                            if (Collisions.IntersectPolygons(
+                                ((PolygonBody)bodies[i]).GetTransformedVerticies(),
+                                ((PolygonBody)bodies[j]).GetTransformedVerticies(),
+                                out Vector2 normal,
+                                out float depth))
+                            {
+                                ((PolygonBody)bodies[i]).Move(-normal.Scale((depth / 2.0)));
+                                ((PolygonBody)bodies[j]).Move(normal.Scale((depth / 2.0)));
+                            }
                         }
                     }
                 }
@@ -254,18 +302,24 @@ namespace EngineForm
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Vector2[] v = {
+            Vector2[] v1 = {
                 new Vector2(100, 100),
                 new Vector2(200, 100),
                 new Vector2(250, 150),
                 new Vector2(200, 200),
                 new Vector2(100, 200),
             };
+            Vector2[] v2 = {
+                new Vector2(100, 400),
+                new Vector2(200, 400),
+                new Vector2(150, 500),
+            };
+            bodies.Add(new PolygonBody(1, new Vector2(100, 100), 1, 0, Color.Pink, v1));
             bodies.Add(new BoxBody(1, new Vector2(500, 100), 1, 0, Color.Pink, 100, 100));
             bodies.Add(new BoxBody(1, new Vector2(700, 100), 1, 0, Color.Gray, 100, 100));
             bodies.Add(new CircleBody(1, new Vector2(600, 300), 1, 0, Color.Pink, 50));
             bodies.Add(new CircleBody(1, new Vector2(700, 300), 1, 0, Color.Gray, 50));
-            bodies.Add(new PolygonBody(1, new Vector2(100, 100), 1, 0, Color.Pink, v));
+            bodies.Add(new PolygonBody(1, new Vector2(100, 400), 1, 0, Color.Gray, v2));
         }
 
         private void MainScreen_MouseMove(object sender, MouseEventArgs e)
@@ -287,6 +341,14 @@ namespace EngineForm
                     if (body.GetType() == typeof(CircleBody))
                     {
                         if (((CircleBody)body).IsInside(mouse - zero))
+                        {
+                            body.MoveTo(mouse - zero);
+                            break;
+                        }
+                    }
+                    if (body.GetType() == typeof(PolygonBody))
+                    {
+                        if (((PolygonBody)body).IsInside(mouse - zero))
                         {
                             body.MoveTo(mouse - zero);
                             break;
