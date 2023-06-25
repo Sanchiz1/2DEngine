@@ -19,7 +19,7 @@ namespace EngineForm
         public bool rotatingRight;
         public bool rotatingLeft;
         public float scale = 1;
-        public List<Physics.Body> bodies = new List<Physics.Body>();
+        public List<Body> bodies = new List<Body>();
 
         public Form1()
         {
@@ -293,7 +293,6 @@ namespace EngineForm
                 }
                 if (bodies[i].GetType() == typeof(PolygonBody))
                 {
-                    label3.Text = ((PolygonBody)bodies[i]).VertciesToString();
                     Drawing.DrawPolygon(e, (PolygonBody)bodies[i], zero, scale);
                 }
             }
@@ -325,10 +324,9 @@ namespace EngineForm
         private void MainScreen_MouseMove(object sender, MouseEventArgs e)
         {
             mouse.X = e.X / scale; mouse.Y = e.Y / scale;
-            label1.Text = mouse.ToString();
             if (moving == true)
             {
-                foreach (Physics.Body body in bodies)
+                foreach (Body body in bodies)
                 {
                     if (body.GetType() == typeof(BoxBody))
                     {
