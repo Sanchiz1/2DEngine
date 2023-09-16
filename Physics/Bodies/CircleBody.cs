@@ -14,10 +14,29 @@ namespace Physics
         {
             diameter = Diameter;
         }
-        public  bool IsInside(Vector2 pos)
+        public override bool IsInside(Vector2 pos)
         {
             if ((pos - position).Length() <= diameter / 2) return true;
             return false;
+        }
+
+        public override void Move(Vector2 dir)
+        {
+            position += dir;
+        }
+        public override void MoveTo(Vector2 dest)
+        {
+            position = dest;
+        }
+
+        public override void Update(float deltaTime)
+        {
+            Vector2 acceleration = forces.Scale(1 / mass);
+            linearVelocity += acceleration * deltaTime;
+            position += linearVelocity * deltaTime;
+
+
+            forces = new Vector2(0, 0);
         }
     }
 }

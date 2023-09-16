@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bodies\Body.cs" />
-    <Compile Include="Bodies\BoxBody.cs" />
+    <Compile Include="Bodies\BodyFactory.cs" />
     <Compile Include="Bodies\CircleBody.cs" />
     <Compile Include="Collisions.cs" />
     <Compile Include="Drawing.cs" />
@@ -52,6 +52,7 @@
     <Compile Include="Bodies\PolygonBody.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vector2.cs" />
+    <Compile Include="World.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

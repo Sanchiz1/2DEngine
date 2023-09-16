@@ -12,21 +12,7 @@ namespace Physics
     {
         public static bool CirclesCollision(CircleBody circle1, CircleBody circle2)
         {
-            if ((circle1.position - circle2.position).Length() < (circle1.diameter + circle2.diameter) / 2)
-            {
-                Vector2 normal1 = new Vector2();
-                normal1.Normalize(circle1.position - circle2.position);
-                Vector2 normal2 = new Vector2();
-                normal2.Normalize(circle2.position - circle1.position);
-                double overlap = (circle1.diameter + circle2.diameter) / 2 - (circle1.position - circle2.position).Length();
-                circle1.position += normal1.Scale((overlap) / 2);
-                circle2.position += normal2.Scale((overlap) / 2);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+           return ((circle1.position - circle2.position).Length() < (circle1.diameter + circle2.diameter) / 2);
         }
 
         public static bool IntersectCirclePolygon(Vector2 circlePosition, float radius, Vector2[] vertcies, out Vector2 normal, out float depth)
@@ -258,6 +244,28 @@ namespace Physics
                 }
             }
             return true;
+        }
+
+        public static void ResolvePolygonsCollision(PolygonBody body1, PolygonBody body2, Vector2 normal, double depth)
+        {
+            body1.Move(-normal.Scale((depth / 2.0)));
+            body2.Move(normal.Scale((depth / 2.0)));
+        }
+
+        public static void ResolveCirclesCollision(CircleBody body1, CircleBody body2)
+        {
+            Vector2 normal1 = new Vector2();
+            normal1.Normalize(body1.position - body2.position);
+            Vector2 normal2 = new Vector2();
+            normal2.Normalize(body2.position - body1.position);
+            double overlap = (body1.diameter + body2.diameter) / 2 - (body1.position - body2.position).Length();
+            body1.Move(normal1.Scale((overlap) / 2));
+            body2.Move(normal2.Scale((overlap) / 2));
+        }
+        public static void ResolvePolygonCircleCollision(CircleBody body1, PolygonBody body2, Vector2 normal, double depth)
+        {
+            body1.Move(-normal.Scale((depth / 2.0)));
+            body2.Move(normal.Scale((depth / 2.0)));
         }
     }
 }

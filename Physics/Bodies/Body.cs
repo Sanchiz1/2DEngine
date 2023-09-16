@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace Physics
 {
-    public class Body
+    public abstract class Body
     {
         public double mass;
         public Vector2 position;
         public double velocity;
+        public Vector2 linearVelocity;
+        public Vector2 forces;
         public double rotaion;
         public Color color;
         public Body(double Mass, Vector2 Position, double Velocity, double Rotation, Color Color)
@@ -21,15 +23,19 @@ namespace Physics
             velocity = Velocity;
             rotaion = Rotation;
             color = Color;
+            forces = new Vector2(0, 0);
+            linearVelocity = new Vector2(0, 0);
         }
 
-        public virtual void Move(Vector2 dir)
+        public abstract bool IsInside(Vector2 pos);
+        public abstract void Move(Vector2 dir);
+        public abstract void MoveTo(Vector2 dest);
+
+        public void ApplyForce(Vector2 Force)
         {
-            this.position += dir;
+            forces += Force;
         }
-        public virtual void MoveTo(Vector2 dest)
-        {
-            this.position = dest;
-        }
+
+        public abstract void Update(float deltaTime);
     }
 }

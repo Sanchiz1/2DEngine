@@ -15,33 +15,25 @@ namespace Physics
             vertcies = Vertcies;
             position = vertcies[0];
         }
-        public Vector2[] GetTransformedVerticies()
+        public PolygonBody(double Mass, Vector2 Position, double Velocity, double Rotation, Color Color, double width, double height) : base(Mass, Position, Velocity, Rotation, Color)
+        {
+            position = Position;
+            vertcies = new Vector2[] { position, new Vector2(position.X + width, position.Y), new Vector2(position.X + width, position.Y + height), new Vector2(position.X, position.Y + height) };
+        }
+        public Vector2[] GetTransformedVertices()
         {
             Vector2 center = Collisions.FindArithmeticMean(this.vertcies);
             Vector2[] v = new Vector2[vertcies.Length];
             for (int i = 0; i < vertcies.Length; ++i)
             {
-                v[i] = new Vector2((float)(vertcies[i].X - center.X) * Math.Cos(DegreesToRadians(rotaion)) - (vertcies[i].Y - center.Y) * Math.Sin(DegreesToRadians(rotaion)) + center.X,
-                    (float)(vertcies[i].X - center.X) * Math.Sin(DegreesToRadians(rotaion)) + (vertcies[i].Y - center.Y) * Math.Cos(DegreesToRadians(rotaion)) + center.Y
+                v[i] = new Vector2((float)(vertcies[i].X - center.X) * Math.Cos(PhysicsMath.DegreesToRadians(rotaion)) - (vertcies[i].Y - center.Y) * Math.Sin(PhysicsMath.DegreesToRadians(rotaion)) + center.X,
+                    (float)(vertcies[i].X - center.X) * Math.Sin(PhysicsMath.DegreesToRadians(rotaion)) + (vertcies[i].Y - center.Y) * Math.Cos(PhysicsMath.DegreesToRadians(rotaion)) + center.Y
                     );
             }
             return v;
         }
-        double DegreesToRadians(double degrees)
-        {
-            return degrees * Math.PI / 180.0;
-        }
 
-        public PointF[] GetPoints(Vector2[] v, Vector2 zero)
-        {
-            PointF[] p = new PointF[vertcies.Length];
-            for (int i = 0; i < v.Length; ++i)
-            {
-                p[i] = new PointF((float)(v[i].X + zero.X), (float)(v[i].Y + zero.Y));
-            }
-            return p;
-        }
-        public bool IsInside(Vector2 pos)
+        public override bool IsInside(Vector2 pos)
         {
             return Physics.Collisions.IsDotInside(vertcies, pos);
         }
@@ -61,6 +53,7 @@ namespace Physics
             {
                 vertcies[i] += dir;
             }
+            position += dir;
         }
         public override void MoveTo(Vector2 dir)
         {
@@ -69,6 +62,17 @@ namespace Physics
             {
                 vertcies[i] -= addition;
             }
+            position -= addition;
+        }
+
+        public override void Update(float deltaTime)
+        {
+            Vector2 acceleration = forces.Scale(1 / mass);
+            linearVelocity += acceleration * deltaTime;
+            this.Move(linearVelocity * deltaTime);
+
+
+            forces = new Vector2(0, 0);
         }
     }
 }

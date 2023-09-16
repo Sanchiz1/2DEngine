@@ -20,22 +20,6 @@ namespace Physics
                 (int)(End.X + zero.X),
                 (int)(End.Y + zero.Y));
         }
-        public static void DrawBox(PaintEventArgs e, BoxBody box, Vector2 zero, float scale)
-        {
-            e.Graphics.ScaleTransform(scale, scale);
-            Rectangle rectangle = new Rectangle(
-                (int)(box.position.X - box.width / 2 + zero.X),
-                (int)(box.position.Y - box.height / 2 + zero.Y),
-                (int)(box.width),
-                (int)(box.height));
-            
-            e.Graphics.TranslateTransform((float)(box.position.X + zero.X), (float)(box.position.Y + zero.Y));
-            e.Graphics.RotateTransform((float)box.rotaion);
-            e.Graphics.TranslateTransform((float)-(box.position.X + zero.X), (float)-(box.position.Y + zero.Y));
-            e.Graphics.FillRectangle(new SolidBrush(box.color), rectangle);
-            e.Graphics.DrawRectangle(new Pen(Color.Silver, 2), rectangle);
-            e.Graphics.ResetTransform();
-        }
         public static void DrawCircle(PaintEventArgs e, CircleBody circle, Vector2 zero, float scale)
         {
             e.Graphics.ScaleTransform(scale, scale);
@@ -48,8 +32,8 @@ namespace Physics
         public static void DrawPolygon(PaintEventArgs e, PolygonBody polygon, Vector2 zero, float scale)
         {
             e.Graphics.ScaleTransform(scale, scale);
-            e.Graphics.FillPolygon(new SolidBrush(polygon.color), polygon.GetPoints(polygon.GetTransformedVerticies(), zero));
-            e.Graphics.DrawPolygon(new Pen(Color.Silver, 2), polygon.GetPoints(polygon.GetTransformedVerticies(), zero));
+            e.Graphics.FillPolygon(new SolidBrush(polygon.color), PhysicsMath.GetPointsFromVector2(polygon.GetTransformedVertices(), zero, polygon.vertcies.Length));
+            e.Graphics.DrawPolygon(new Pen(Color.Silver, 2), PhysicsMath.GetPointsFromVector2(polygon.GetTransformedVertices(), zero, polygon.vertcies.Length));
             e.Graphics.ResetTransform();
         }
     }
