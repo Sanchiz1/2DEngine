@@ -10,7 +10,7 @@ namespace Physics
     public class CircleBody : Body
     {
         public double diameter;
-        public CircleBody(double Mass, Vector2 Position, double Velocity, double Rotation, Color Color, double Diameter) : base(Mass, Position, Velocity, Rotation, Color)
+        public CircleBody(double Mass, double Restitution, Vector2 Position, double Velocity, double Rotation, Color Color, double Diameter) : base(Mass, Position, Velocity, Rotation, Color, Restitution)
         {
             diameter = Diameter;
         }

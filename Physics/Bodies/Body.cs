@@ -10,15 +10,17 @@ namespace Physics
     public abstract class Body
     {
         public double mass;
+        public double restitution;
         public Vector2 position;
         public double velocity;
         public Vector2 linearVelocity;
         public Vector2 forces;
         public double rotaion;
         public Color color;
-        public Body(double Mass, Vector2 Position, double Velocity, double Rotation, Color Color)
+        public Body(double Mass, Vector2 Position, double Velocity, double Rotation, Color Color, double Restitution)
         {
             mass = Mass;
+            restitution = Restitution;
             position = Position;
             velocity = Velocity;
             rotaion = Rotation;

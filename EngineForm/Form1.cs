@@ -47,6 +47,11 @@ namespace EngineForm
             {
                 zero.X -= 3;
             }
+            if(force.X != 0 || force.Y != 0)
+            {
+                world.bodies[0].ApplyForce(force);
+                force = new Vector2(0, 0);
+            }
             world.UpdateWorld();
             for (int i = 0; i < world.bodies.Count; ++i)
             {
@@ -111,25 +116,19 @@ namespace EngineForm
             if (e.KeyCode == Keys.W)
             {
                 force.Y -= 2;
-                world.bodies[0].ApplyForce(force);
             }
             if (e.KeyCode == Keys.S)
             {
                 force.Y += 2;
-                world.bodies[0].ApplyForce(force);
             }
             if (e.KeyCode == Keys.A)
             {
                 force.X -= 2;
-                world.bodies[0].ApplyForce(force);
             }
             if (e.KeyCode == Keys.D)
             {
                 force.X += 2;
-                world.bodies[0].ApplyForce(force);
             }
-            force = new Vector2(0, 0);
-            label1.Text = force.ToString();
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
@@ -186,12 +185,12 @@ namespace EngineForm
                 new Vector2(200, 400),
                 new Vector2(150, 500),
             };
-            world.AddBody(BodyFactory.CreatePolygonBody(1, new Vector2(100, 400), 1, 0, Color.Gray, v2));
-            world.AddBody(BodyFactory.CreateBoxBody(1, new Vector2(500, 100), 1, 0, Color.Pink, 100, 100));
-            world.AddBody(BodyFactory.CreateBoxBody(1, new Vector2(700, 100), 1, 0, Color.Gray, 100, 100));
-            world.AddBody(BodyFactory.CreateCircleBody(1, new Vector2(600, 300), 1, 0, Color.Pink, 50));
-            world.AddBody(BodyFactory.CreateCircleBody(1, new Vector2(700, 300), 1, 0, Color.Gray, 50));
-            world.AddBody(BodyFactory.CreatePolygonBody(1, new Vector2(100, 100), 1, 0, Color.Pink, v1));
+            world.AddBody(BodyFactory.CreatePolygonBody(1, 1, new Vector2(100, 400), 1, 0, Color.Gray, v2));
+            world.AddBody(BodyFactory.CreateBoxBody(1, 1, new Vector2(500, 100), 1, 0, Color.Pink, 100, 100));
+            world.AddBody(BodyFactory.CreateBoxBody(1, 1, new Vector2(700, 100), 1, 0, Color.Gray, 100, 100));
+            world.AddBody(BodyFactory.CreateCircleBody(1, 1, new Vector2(600, 300), 1, 0, Color.Pink, 50));
+            world.AddBody(BodyFactory.CreateCircleBody(1, 1, new Vector2(700, 300), 1, 0, Color.Gray, 50));
+            world.AddBody(BodyFactory.CreatePolygonBody(1, 1, new Vector2(100, 100), 1, 0, Color.Pink, v1));
         }
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]

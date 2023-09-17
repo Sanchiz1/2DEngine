@@ -10,12 +10,12 @@ namespace Physics
     public class PolygonBody : Body
     {
         public Vector2[] vertcies;
-        public PolygonBody(double Mass, Vector2 Position, double Velocity, double Rotation, Color Color, Vector2[] Vertcies) : base(Mass, Position, Velocity, Rotation, Color)
+        public PolygonBody(double Mass, double Restitution, Vector2 Position, double Velocity, double Rotation, Color Color, Vector2[] Vertcies) : base(Mass, Position, Velocity, Rotation, Color, Restitution)
         {
             vertcies = Vertcies;
             position = vertcies[0];
         }
-        public PolygonBody(double Mass, Vector2 Position, double Velocity, double Rotation, Color Color, double width, double height) : base(Mass, Position, Velocity, Rotation, Color)
+        public PolygonBody(double Mass, double Restitution, Vector2 Position, double Velocity, double Rotation, Color Color, double width, double height) : base(Mass, Position, Velocity, Rotation, Color, Restitution)
         {
             position = Position;
             vertcies = new Vector2[] { position, new Vector2(position.X + width, position.Y), new Vector2(position.X + width, position.Y + height), new Vector2(position.X, position.Y + height) };

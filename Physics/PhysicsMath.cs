@@ -13,7 +13,7 @@ namespace Physics
         {
             return a < b ? a : b;
         }
-        public static float Min(float a, float b)
+        public static double Min(double a, double b)
         {
             return a < b ? a : b;
         }

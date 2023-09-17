@@ -31,9 +31,9 @@ namespace Physics
                     {
                         if (bodies[j].GetType() == typeof(CircleBody))
                         {
-                            if (Collisions.CirclesCollision((CircleBody)bodies[i], (CircleBody)bodies[j]))
+                            if (Collisions.CirclesCollision((CircleBody)bodies[i], (CircleBody)bodies[j], out Vector2 normal))
                             {
-                                Collisions.ResolveCirclesCollision((CircleBody)bodies[i], (CircleBody)bodies[j]);
+                                Collisions.ResolveCollision(bodies[i], bodies[j], normal);
                             };
                         }
                         else
@@ -45,7 +45,7 @@ namespace Physics
                                 out Vector2 normal,
                                 out float depth))
                             {
-                                Collisions.ResolvePolygonCircleCollision((CircleBody)bodies[i], (PolygonBody)bodies[j], normal, depth);
+                                Collisions.ResolveCollision(bodies[i], bodies[j], normal);
                             }
                         }
                     }
@@ -60,7 +60,7 @@ namespace Physics
                                 out Vector2 normal,
                                 out float depth))
                             {
-                                Collisions.ResolvePolygonCircleCollision((CircleBody)bodies[j], (PolygonBody)bodies[i], normal, depth);
+                                Collisions.ResolveCollision(bodies[j], bodies[i], normal);
                             }
                         }
                         else
@@ -71,7 +71,7 @@ namespace Physics
                                 out Vector2 normal,
                                 out float depth))
                             {
-                                Collisions.ResolvePolygonsCollision((PolygonBody)bodies[i], (PolygonBody)bodies[j], normal, depth);
+                                Collisions.ResolveCollision(bodies[i], bodies[j], normal);
                             }
                         }
                     }

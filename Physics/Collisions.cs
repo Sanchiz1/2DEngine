@@ -5,14 +5,21 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace Physics
 {
     public static class Collisions
     {
-        public static bool CirclesCollision(CircleBody circle1, CircleBody circle2)
+        public static bool CirclesCollision(CircleBody circle1, CircleBody circle2, out Vector2 normal)
         {
-           return ((circle1.position - circle2.position).Length() < (circle1.diameter + circle2.diameter) / 2);
+            normal = new Vector2();
+            if ((circle1.position - circle2.position).Length() < (circle1.diameter + circle2.diameter) / 2)
+            {
+                normal.Normalize(circle1.position - circle2.position);
+                return true;
+            }
+            return false;
         }
 
         public static bool IntersectCirclePolygon(Vector2 circlePosition, float radius, Vector2[] vertcies, out Vector2 normal, out float depth)
@@ -93,7 +100,7 @@ namespace Physics
                 Vector2 v = vertcies[i];
                 float distance = (float)(v - circlePosition).Length();
 
-                if(distance < minDistance)
+                if (distance < minDistance)
                 {
                     minDistance = distance;
                     result = i;
@@ -113,7 +120,7 @@ namespace Physics
             min = (float)axis.DotProduct(p1);
             max = (float)axis.DotProduct(p2);
 
-            if(min > max)
+            if (min > max)
             {
                 float temp = min;
                 min = max;
@@ -246,26 +253,16 @@ namespace Physics
             return true;
         }
 
-        public static void ResolvePolygonsCollision(PolygonBody body1, PolygonBody body2, Vector2 normal, double depth)
+        public static void ResolveCollision(Body body1, Body body2, Vector2 normal)
         {
-            body1.Move(-normal.Scale((depth / 2.0)));
-            body2.Move(normal.Scale((depth / 2.0)));
-        }
+            Vector2 relativeVelocity = body2.linearVelocity - body1.linearVelocity;
 
-        public static void ResolveCirclesCollision(CircleBody body1, CircleBody body2)
-        {
-            Vector2 normal1 = new Vector2();
-            normal1.Normalize(body1.position - body2.position);
-            Vector2 normal2 = new Vector2();
-            normal2.Normalize(body2.position - body1.position);
-            double overlap = (body1.diameter + body2.diameter) / 2 - (body1.position - body2.position).Length();
-            body1.Move(normal1.Scale((overlap) / 2));
-            body2.Move(normal2.Scale((overlap) / 2));
-        }
-        public static void ResolvePolygonCircleCollision(CircleBody body1, PolygonBody body2, Vector2 normal, double depth)
-        {
-            body1.Move(-normal.Scale((depth / 2.0)));
-            body2.Move(normal.Scale((depth / 2.0)));
+            double e = PhysicsMath.Min(body1.restitution, body2.restitution);
+
+            double j = -(1f + e) * relativeVelocity.DotProduct(normal) / ((1f / body1.mass) + (1f / body2.mass));
+
+            body1.linearVelocity -= j / body1.mass * normal;
+            body2.linearVelocity += j / body2.mass * normal;
         }
     }
 }
